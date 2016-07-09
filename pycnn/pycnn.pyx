@@ -157,44 +157,28 @@ cdef class LookupParameters:
 
 cdef class Model:
     cdef CModel *thisptr
-    cdef object named_params
-    cdef object lookups
-    cdef object regular
     def __cinit__(self):
         self.thisptr = new CModel()
     def __init__(self):
-        self.named_params = {}
-        self.lookups = []
-        self.regular = []
+        pass
 
     def __dealloc__(self): del self.thisptr
 
-    def add_parameters(self, name, dim, scale=0):
+    def add_parameters(self, dim, scale=0):
+        assert(isinstance(dim,(tuple,int)))
         cdef CParameters* p
-        assert(name not in self.named_params), "name already registered"
         p = self.thisptr.add_parameters(Dim(dim))
         cdef Parameters pp = Parameters.wrap_ptr(p)
-        self.named_params[name] = pp
-        self.regular.append(name)
         return pp
 
-    def add_lookup_parameters(self, name, dim):
+    def add_lookup_parameters(self, dim):
         assert(isinstance(dim, tuple))
-        assert(name not in self.named_params), "name already registered"
         cdef int nids = dim[0]
         rest = tuple(dim[1:])
         cdef CLookupParameters* p
         p = self.thisptr.add_lookup_parameters(nids, Dim(rest))
         cdef LookupParameters pp = LookupParameters.wrap_ptr(p)
-        self.named_params[name] = pp
-        self.lookups.append(name)
         return pp
-
-    def __getitem__(self, name):
-        return self.named_params[name]
-
-    def __contains__(self, name):
-        return name in self.named_params
 
     #def parameters(self): return self.named_params.keys()
     #def lookup_parameters(self): return list(self.lookups)
@@ -1098,8 +1082,8 @@ cdef class StackedRNNState:
 # {{{ Training 
 cdef class SimpleSGDTrainer:
     cdef CSimpleSGDTrainer *thisptr
-    def __cinit__(self, Model m, float lam = 1e-6, float e0 = 0.1):
-        self.thisptr = new CSimpleSGDTrainer(m.thisptr, lam, e0)
+    def __cinit__(self, Model m, float e0 = 0.1):
+        self.thisptr = new CSimpleSGDTrainer(m.thisptr, 1e-6, e0)
     def __dealloc__(self):
         del self.thisptr
     cpdef update(self, float s=1.0):
@@ -1111,8 +1095,8 @@ cdef class SimpleSGDTrainer:
 
 cdef class MomentumSGDTrainer:
     cdef CMomentumSGDTrainer *thisptr
-    def __cinit__(self, Model m, float lam = 1e-6, float e0 = 0.01, float mom = 0.9):
-        self.thisptr = new CMomentumSGDTrainer(m.thisptr, lam, e0, mom)
+    def __cinit__(self, Model m, float e0 = 0.01, float mom = 0.9):
+        self.thisptr = new CMomentumSGDTrainer(m.thisptr, 1e-6, e0, mom)
     def __dealloc__(self):
         del self.thisptr
     cpdef update(self, float s=1.0):
@@ -1124,8 +1108,8 @@ cdef class MomentumSGDTrainer:
 
 cdef class AdagradTrainer:
     cdef CAdagradTrainer *thisptr
-    def __cinit__(self, Model m, float lam = 1e-6, float e0 = 0.1, float eps = 1e-20):
-        self.thisptr = new CAdagradTrainer(m.thisptr, lam, e0, eps)
+    def __cinit__(self, Model m, float e0 = 0.1, float eps = 1e-20):
+        self.thisptr = new CAdagradTrainer(m.thisptr, 1e-6, e0, eps)
     def __dealloc__(self):
         del self.thisptr
     cpdef update(self, float s=1.0):
@@ -1137,8 +1121,8 @@ cdef class AdagradTrainer:
 
 cdef class AdadeltaTrainer:
     cdef CAdadeltaTrainer *thisptr
-    def __cinit__(self, Model m, float lam = 1e-6, float eps = 1e-6, float rho = 0.95):
-        self.thisptr = new CAdadeltaTrainer(m.thisptr, lam, eps, rho)
+    def __cinit__(self, Model m, float eps = 1e-6, float rho = 0.95):
+        self.thisptr = new CAdadeltaTrainer(m.thisptr, 1e-6, eps, rho)
     def __dealloc__(self):
         del self.thisptr
     cpdef update(self, float s=1.0):
@@ -1150,8 +1134,8 @@ cdef class AdadeltaTrainer:
 
 cdef class AdamTrainer:
     cdef CAdamTrainer *thisptr
-    def __cinit__(self, Model m, float lam = 1e-6, float alpha = 0.001, float beta_1 = 0.9, float beta_2 = 0.999, eps = 1e-8 ):
-        self.thisptr = new CAdamTrainer(m.thisptr, lam, alpha, beta_1, beta_2, eps)
+    def __cinit__(self, Model m, float alpha = 0.001, float beta_1 = 0.9, float beta_2 = 0.999, eps = 1e-8 ):
+        self.thisptr = new CAdamTrainer(m.thisptr, 1e-6, alpha, beta_1, beta_2, eps)
     def __dealloc__(self):
         del self.thisptr
     cpdef update(self, float s=1.0):
