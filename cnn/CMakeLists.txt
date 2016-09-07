@@ -72,6 +72,8 @@ set(cnn_library_HDRS
     timing.h
     training.h
     weight-decay.h
+    except.h
+    nodes-macros.h
 )
 
 if(WITH_CUDA_BACKEND)
@@ -123,5 +125,8 @@ endif(WITH_CUDA_BACKEND)
 install(FILES ${cnn_library_HDRS} DESTINATION include/cnn)
 install(TARGETS cnn DESTINATION lib)
 
+if(WITH_CUDA_BACKEND)
+install(TARGETS cnncuda DESTINATION lib)
+endif(WITH_CUDA_BACKEND)
 # target_compile_features(cnn PRIVATE cxx_range_for)
 

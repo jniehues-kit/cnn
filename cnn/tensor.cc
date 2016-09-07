@@ -80,6 +80,11 @@ void TensorTools::CopyElement(const Tensor& l, int lindex, Tensor& r, int rindex
 }
 
 void TensorTools::SetElements(const Tensor& v, const vector<float>& vec) {
+	if(vec.size() != v.d.size()) {
+		cerr << "Input tensor: " << vec.size() << endl;
+		cerr << "Current tensor:" << v.d << endl;
+	}
+	assert(vec.size() == v.d.size());
 #if HAVE_CUDA
   cudaMemcpyAsync(v.v, &vec[0], sizeof(real) * vec.size(), cudaMemcpyHostToDevice);
 #else

@@ -33,6 +33,12 @@ void RNNBuilder::load_parameters_pretraining(const string& fname) {
   abort();
 }
 
+void RNNBuilder::init_parameters(int layer,int index, const std::vector<float>& vec) {
+  cerr << "RNNBuilder::init_parameters not overridden.\n";
+  abort();
+}
+
+
 SimpleRNNBuilder::SimpleRNNBuilder(unsigned layers,
                        unsigned input_dim,
                        unsigned hidden_dim,
