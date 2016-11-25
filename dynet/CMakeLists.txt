@@ -79,9 +79,10 @@ set(dynet_library_HDRS
 )
 
 file(GLOB TEST_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} tests/*.cc)
-if (NOT MSVC)
-  set(BUILD_SHARED_LIBS ON)
-endif()
+#if (NOT MSVC)
+#  set(BUILD_SHARED_LIBS ON)
+#endif()
+OPTION(BUILD_SHARED_LIBS "Build package with shared libraries (default: on)." ON)
 
 #foreach(test_src ${TEST_SRCS})
   #Extract the filename without an extension (NAME_WE)
